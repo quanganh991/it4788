@@ -95,4 +95,44 @@ class post_from_friend_controller{
       throw Exception('Failed to create album.' + response.statusCode.toString());
     }
   }
+
+  static Stream<combine_posts_users_models> GetPostDetailFromIdRealtime(String id_posts) async*{
+
+    final http.Response response = await http.post("http://"+IP_ADDRESS+"/api/get_post/",
+      body: {
+        'id_posts': id_posts,
+      },
+    );
+
+
+    if (response.statusCode == 201) {
+      combine_posts_users_models result;
+
+      result = (new combine_posts_users_models(
+        id_posts: json.decode(utf8.decode(response.bodyBytes))['data']['id_posts'],
+        likes_post: json.decode(utf8.decode(response.bodyBytes))['data']['likes_post'],
+        comment_post: json.decode(utf8.decode(response.bodyBytes))['data']['comment_post'],
+        media_url: json.decode(utf8.decode(response.bodyBytes))['data']['media_url'],
+        shares_post: json.decode(utf8.decode(response.bodyBytes))['data']['shares_post'],
+        time_post: json.decode(utf8.decode(response.bodyBytes))['data']['time_post'],
+        title: json.decode(utf8.decode(response.bodyBytes))['data']['title'],
+        id_users: json.decode(utf8.decode(response.bodyBytes))['data']['id_users'],
+        username: json.decode(utf8.decode(response.bodyBytes))['data']['username'],
+        password: json.decode(utf8.decode(response.bodyBytes))['data']['password'],
+        name: json.decode(utf8.decode(response.bodyBytes))['data']['name'],
+        avatar: json.decode(utf8.decode(response.bodyBytes))['data']['avatar'],
+        create_at: json.decode(utf8.decode(response.bodyBytes))['data']['create_at'],
+        push_token: json.decode(utf8.decode(response.bodyBytes))['data']['push_token'],
+        cover_picture: json.decode(utf8.decode(response.bodyBytes))['data']['cover_picture'],
+        country: json.decode(utf8.decode(response.bodyBytes))['data']['country'],
+        city: json.decode(utf8.decode(response.bodyBytes))['data']['city'],
+        company: json.decode(utf8.decode(response.bodyBytes))['data']['company'],
+      ));
+
+      yield result;
+    }
+    else {
+      throw Exception('Failed to create album.' + response.statusCode.toString());
+    }
+  }
 }

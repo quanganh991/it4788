@@ -101,7 +101,7 @@ notification_controller.SetReadNotificate(notifiDetail.id_notifications.toString
           );
           }
         else {
-          return CircularProgressIndicator();
+          return Container();
         }
       },
     ),

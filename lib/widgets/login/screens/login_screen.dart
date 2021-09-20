@@ -10,6 +10,10 @@ import 'package:fakebook_homepage/screens/screens.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -17,50 +21,59 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _rememberMe = false;
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   Future<users_models> currentUserHere;
-
-
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  SharedPreferences prefs;
-
   bool isLoggedIn = false;
-  User currentUser;
+
+  File jsonFile;
+  Directory dir;
+  String fileName = "myFile.json";
+  bool fileExists = false;
+  Map<String, dynamic> fileContent;
 
   @override
   void initState() {
     super.initState();
-    //isSignedIn(); //hàm kiểm tra xem có đăng nhập hay ko
+    getApplicationDocumentsDirectory().then((Directory directory) {
+      dir = directory;
+      jsonFile = new File(dir.path + "/" + fileName); //"myFile.json"
+      fileExists = jsonFile.existsSync();
+      if (fileExists)
+        this.setState(
+                () => {
+                  fileContent = json.decode(jsonFile.readAsStringSync()),
+                }
+        );
+      currentUserHere = login_controller.CheckAutoLogin(fileContent);
+
+    });
+    //print("---------------fileContent = " + fileContent.toString());
   }
 
-  Widget _buildSocialBtn(Function onTap, AssetImage logo) { //2 nút đăng nhập = fb và google
-    //nút Facebook và GG chung
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 60.0, //chiều rộng và chiều cao của cái khung chứa cả 2 nút
-        width: 60.0,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.greenAccent, //màu của bóng mờ
-              offset: Offset(0, 2), //tọa độ làm mờ, lấy (0,0) làm tâm
-              blurRadius: 8.0, //phân tán độ mờ (càng cao thì càng loãng)
-            ),
-          ],
-          image: DecorationImage(
-            image: logo,
-          ),
-        ),
-      ),
-    );
+  void createFile(Map<String, dynamic> content, Directory dir, String fileName) {
+    print("----------------------Creating file!----------------------");
+    File file = new File(dir.path + "/" + fileName);
+    file.createSync();
+    fileExists = true;
+    file.writeAsStringSync(json.encode(content));
   }
 
+  void writeToFile(String key, dynamic value) {
+    print("----------------------Writing to file!----------------------");
+    Map<String, dynamic> content = {key: value};
+    if (fileExists) {
+      print("----------------------File exists----------------------");
+      Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
+      jsonFileContent.addAll(content);
+      jsonFile.writeAsStringSync(json.encode(jsonFileContent));
+    } else {
+      print("----------------------File does not exist!----------------------");
+      createFile(content, dir, fileName); //"myFile.json"
+    }
+    this.setState(() => fileContent = json.decode(jsonFile.readAsStringSync()));  //đọc nội dung json sau khi đã thêm
+    print(fileContent); //in nội dung ra
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -280,6 +293,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                     builder: (context, snapshot) {  //snapshot = _futureAlbum
                                       if (snapshot.hasData && snapshot.data.id_users != null) {
                                         WidgetsBinding.instance.addPostFrameCallback((_){
+                                          writeToFile("id_users", snapshot.data.id_users.toString());
+                                          writeToFile("username", snapshot.data.username.toString());
+                                          writeToFile("password", snapshot.data.password.toString());
+                                          writeToFile("name", snapshot.data.name.toString());
+                                          writeToFile("create_at", snapshot.data.create_at.toString());
+                                          writeToFile("push_token", snapshot.data.push_token.toString());
+                                          writeToFile("country", snapshot.data.country.toString());
+                                          writeToFile("city", snapshot.data.city.toString());
+                                          writeToFile("company", snapshot.data.company.toString());
+                                          writeToFile("avatar", snapshot.data.avatar.toString());
+                                          writeToFile("cover_picture", snapshot.data.cover_picture.toString());
+
                                           Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
                                             context,  //điều hướng từ
                                             MaterialPageRoute(  //điều hướng sang

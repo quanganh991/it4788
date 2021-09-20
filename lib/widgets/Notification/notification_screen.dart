@@ -49,7 +49,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   child: Text("Earlier", style: TextStyle(fontWeight: FontWeight.bold),),
                 ),
                 FutureBuilder(
-      future: allNotifications, //là 1 cái mảng chứa tất cả người dùng
+      future: notification_controller.GetAllNotification(currentUser.id_users.toString()), //là 1 cái mảng chứa tất cả người dùng
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return
@@ -73,7 +73,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             );
         }
         else {
-          return CircularProgressIndicator();
+          return Container();
         }
       },
     ),

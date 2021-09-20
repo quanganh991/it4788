@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fakebook_homepage/models/users_models.dart';
 import 'package:fakebook_homepage/widgets/Personal/profile_avatar.dart';
 import 'package:fakebook_homepage/widgets/PersonalInformation/view_one_s_profile.dart';
@@ -5,6 +7,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fakebook_homepage/widgets/PersonalInformation/menu_item.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:fakebook_homepage/models/models.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
 
 // import '../widgets/profile_avatar.dart';
 
@@ -22,6 +30,50 @@ class _MenuScreenState extends State<MenuScreen> {
   _MenuScreenState({Key key, this.currentUser});
 
 
+
+  File jsonFile;
+  Directory dir;
+  String fileName = "myFile.json";
+  bool fileExists = false;
+  Map<String, dynamic> fileContent;
+
+  @override
+  void initState() {
+    super.initState();
+    getApplicationDocumentsDirectory().then((Directory directory) {
+      dir = directory;
+      jsonFile = new File(dir.path + "/" + fileName); //"myFile.json"
+      fileExists = jsonFile.existsSync();
+      if (fileExists)
+        this.setState(
+                () => fileContent = json.decode(jsonFile.readAsStringSync())
+        );
+    });
+  }
+
+  void createFile(Map<String, dynamic> content, Directory dir, String fileName) {
+    print("----------------------Creating file!----------------------");
+    File file = new File(dir.path + "/" + fileName);
+    file.createSync();
+    fileExists = true;
+    file.writeAsStringSync(json.encode(content));
+  }
+
+  void deleteFile(String key, dynamic value) {
+    print("----------------------Deleting to file!----------------------");
+    Map<String, dynamic> content = {key: value};
+    if (fileExists) {
+      print("----------------------File exists----------------------");
+      Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
+      jsonFileContent.remove(key);
+      jsonFile.writeAsStringSync(json.encode(jsonFileContent));
+    } else {
+      print("----------------------File does not exist!----------------------");
+      createFile(content, dir, fileName); //"myFile.json"
+    }
+    this.setState(() => fileContent = json.decode(jsonFile.readAsStringSync()));  //đọc nội dung json sau khi đã thêm
+    print(fileContent); //in nội dung ra
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +305,17 @@ class _MenuScreenState extends State<MenuScreen> {
               
             ),
             onPressed: (){
+              deleteFile("id_users", currentUser.id_users.toString());
+              deleteFile("username", currentUser.username.toString());
+              deleteFile("password", currentUser.password.toString());
+              deleteFile("name", currentUser.name.toString());
+              deleteFile("create_at", currentUser.create_at.toString());
+              deleteFile("push_token", currentUser.push_token.toString());
+              deleteFile("country", currentUser.country.toString());
+              deleteFile("city", currentUser.city.toString());
+              deleteFile("company", currentUser.company.toString());
+              deleteFile("avatar", currentUser.avatar.toString());
+              deleteFile("cover_picture", currentUser.cover_picture.toString());
               Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
             },
           )

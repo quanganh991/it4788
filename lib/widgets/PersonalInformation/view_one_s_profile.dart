@@ -7,6 +7,7 @@ import 'package:fakebook_homepage/models/combine_posts_users_models.dart';
 import 'package:fakebook_homepage/models/users_models.dart';
 import 'package:fakebook_homepage/widgets/Personal/get_all_blocked_list.dart';
 import 'package:fakebook_homepage/widgets/Personal/get_all_friends_list.dart';
+import 'package:fakebook_homepage/widgets/PersonalInformation/change_info_after_signup.dart';
 import 'package:fakebook_homepage/widgets/PersonalInformation/error.dart';
 import 'package:fakebook_homepage/widgets/PostFromFriend/posts_from_one_person_only.dart';
 import 'package:fakebook_homepage/widgets/PostFromMine/post.dart';
@@ -156,9 +157,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 15,
                                 ),
 
-                                Text(
+                                FlatButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      new MaterialPageRoute(
+                                          builder: (context) =>
+                                              ChangeInfoScreen(currentUser: currentUser)
+                                  ));
+                                },
+                                child: Text(
                                   "Update Personal Informazione",
                                   style: TextStyle(color: Colors.white),
+                                )
                                 )
                               ],
                             ),

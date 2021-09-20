@@ -5,6 +5,7 @@ import 'package:fakebook_homepage/models/combine_posts_users_models.dart';
 import 'package:fakebook_homepage/controllers/Comment/comment_controller.dart';
 import 'package:fakebook_homepage/controllers/PostFromMine/delete_post.dart';
 import 'package:fakebook_homepage/models/models.dart';
+import 'package:fakebook_homepage/controllers/PostFromFriend/post_from_friend_controller.dart';
 import 'package:fakebook_homepage/widgets/Comment/comment_item.dart';
 import 'package:fakebook_homepage/widgets/Comment/list_comment.dart';
 import 'package:fakebook_homepage/widgets/Like/list_like.dart';
@@ -253,10 +254,9 @@ class _PostStatsState extends State<_PostStats> {
   final combine_posts_users_models each_post;
   final users_models currentUser;
   Future<IconData> icon;
-  int likeqty = 0;
+  int result = 0;
+  int likeqty = 0, cmtqty = 0;
   bool isLoading;
-  Future<List<combine_comments_users_models>> allComments;  //tất cả các comment của 1 bài post nào đó
-
 
   _PostStatsState({
     Key key,
@@ -269,15 +269,15 @@ class _PostStatsState extends State<_PostStats> {
     super.initState();
     icon = LikeController.CheckHasBeenLikedPostEvent(each_post.id_posts.toString(), currentUser.id_users.toString());
     likeqty = int.parse(each_post.likes_post.toString());
-    isLoading = false;
-    allComments = comment_controller.GetAllCommentsOfAPost(each_post.id_posts.toString()); //lấy tất cả các comment của post có id_posts
 
+    isLoading = false;
   }
 
   @override
   Widget build(BuildContext context) {
     //return Container();
     return Column(
+      //trả về 1 cột, trong 1 cột chứa 3 thành phần nằm ngang: like, cmt, share
       children: [
         FlatButton(
           onPressed: () => {
@@ -319,15 +319,34 @@ class _PostStatsState extends State<_PostStats> {
                   ),
                 ),
               ),
-              Text(
-                //số lượng comment
 
-                each_post.comment_post.toString() + " Comments",
 
-                style: TextStyle(
-                  color: Colors.grey[600],
-                ),
+              StreamBuilder(
+                stream: post_from_friend_controller.GetPostDetailFromIdRealtime(each_post.id_posts.toString()),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    cmtqty = snapshot.data.comment_post >= cmtqty ? snapshot.data.comment_post : cmtqty;
+                    return
+                      Text(
+                        //số lượng comment
+                        cmtqty.toString() + " Comments",
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                        ),
+                      );
+                  }
+                  return Text(
+                    //số lượng comment
+                    "0 Comments",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                    ),
+                  );
+                },
               ),
+
+
+
               const SizedBox(width: 8.0),
               //khoảng cách giữa số comment và số lượt share
               Text(
@@ -344,7 +363,6 @@ class _PostStatsState extends State<_PostStats> {
 
         const Divider(), //giống như thẻ <hr>
 
-        //StreamBuilder
 
         Row(
           children: [
@@ -352,8 +370,6 @@ class _PostStatsState extends State<_PostStats> {
               future: icon, //NẾU ĐÃ LIKE HAY CHƯA LIKE
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  print("--------------icon là = " + snapshot.data.toString());
-
                   return
                     _PostButton(
                         icon: Icon(
@@ -389,7 +405,7 @@ class _PostStatsState extends State<_PostStats> {
                           }),
                         });
                 } else {
-                  return CircularProgressIndicator();
+                  return Container();
                 }
               },
             ),
@@ -400,15 +416,19 @@ class _PostStatsState extends State<_PostStats> {
                 size: 20.0,
               ),
               label: 'Comment',
-              onTap: () => {
+              onTap:  () async =>  {
                 //Xử lý sự kiện Comments: Hiển thị danh sách comment
-                Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
+                result = await Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
                   context,  //điều hướng từ
                   MaterialPageRoute(
                       builder: (context) => ListComment(posts: each_post, currentUser: currentUser)
                   ),
-
                 ),
+
+                setState(() {
+                  cmtqty = result != null ? result : 0;
+                })
+
                 //Xử lý sự kiện Comments
               },
             ),
@@ -424,43 +444,9 @@ class _PostStatsState extends State<_PostStats> {
                   //Xử lý sự kiện ấn nút share
 
                   //Xử lý sự kiện ấn nút share
-                }),
+                })
           ],
-        ),
-
-            // Container(height: 900.0, child: ListComment(posts: each_post, currentUser: currentUser)),
-        FutureBuilder(  //tất cả các comment của bài post này
-          // future: allComments, //trả về tất cả bình luận của bài viết có id post
-          future: comment_controller.GetAllCommentsOfAPost(each_post.id_posts.toString()),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return
-                Container(
-                height: MediaQuery.of(context).size.height * 0.5,
-                color: Colors.white,
-                child: Expanded(
-                child: ListView.builder(
-                  itemCount: snapshot.data.length,  //trả về 1 list view độ dài là số comment của bài viết đó
-                  itemBuilder: ((context, index) {  //tại mỗi comment của bài viết
-                    return Container(
-                      child: CommentItem( //combine_comments_users_models
-                        eachComment: snapshot.data[index],  //truyền từng cái comment sang bên kia
-                      ), //từng dòng trong danh sách người like, truyền vào id của người dùng
-                    );
-                  }),
-                ),
-              )
-                );
-
-
-            }
-            return Container();
-          },
-        ),
-
-
-
-
+        )
       ],
     );
   }

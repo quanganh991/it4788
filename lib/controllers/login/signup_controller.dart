@@ -8,7 +8,7 @@ class signup_controller{
     print("--------------reqqd: username = " + username + " password = " + password);
     final http.Response response = await http.post("http://"+ IP_ADDRESS +"/api/signup/",
       body: {
-        'username': username,
+        'username': username.toString(),
         'password': password,
         'name': name,
         'country': country,
@@ -18,7 +18,6 @@ class signup_controller{
     );
 
     if (response.statusCode == 201) {
-      print("-------------------đky thanh cong = " + json.decode(utf8.decode(response.bodyBytes))['data'].toString());
       return users_models.fromJson(json.decode(utf8.decode(response.bodyBytes))['data']);  //server sẽ trả về 1 bản ghi trong csdl thỏa mãn với username và password kia
     } else {
       throw Exception('Failed to create album.' + response.statusCode.toString());

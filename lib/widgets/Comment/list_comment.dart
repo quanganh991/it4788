@@ -42,7 +42,8 @@ class ListCommentState extends State<ListComment> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return
+    Card(
       margin: EdgeInsets.only(top: 30),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -151,13 +152,13 @@ class ListCommentState extends State<ListComment> {
         ],
       ),
     );
+
   }
 
 
   Widget buildInput(context) { //thanh ngang dưới cùng chứa 4 item
     return
       Padding(
-      //
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
@@ -179,9 +180,11 @@ class ListCommentState extends State<ListComment> {
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 1.0),
               child: IconButton(
-                icon: Icon(Icons.face),
+                icon: Icon(Icons.arrow_back_ios),
                 // onPressed: getSticker,
-                color: Colors.grey,
+                color: Colors.grey, onPressed: () {
+                  Navigator.pop(context,0);
+              },
               ),
             ),
             color: Colors.white,
@@ -213,10 +216,9 @@ class ListCommentState extends State<ListComment> {
                 icon: Icon(Icons.send),
                 onPressed: () => {
                   CreateComment(textEditingController.text, posts, currentUser),
-                  setState((){
+                // Navigator.pop(context,0)
 
-                  })
-                },
+              },
                 color: Colors.grey,
               ),
             ),

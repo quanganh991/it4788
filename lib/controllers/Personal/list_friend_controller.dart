@@ -74,7 +74,6 @@ class list_friend_controller{
       }
       return result;
     } else {
-      print("-----------------hygf7igusdbsq = " + json.decode(utf8.decode(response.bodyBytes)).toString());
       throw Exception('Failed to create album.' + response.statusCode.toString());
     }
   }

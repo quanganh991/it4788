@@ -419,15 +419,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       currentUserHere = null;
                                       return Text("${snapshot.error}");
                                     } else {
-                                      Fluttertoast.showToast(
-                                          msg: "Tài khoản đã tồn tại hoặc không hợp lệ",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.CENTER,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.red,
-                                          textColor: Colors.white,
-                                          fontSize: 16.0
-                                      );
                                       currentUserHere = null;
                                       return Text(
                                         'ĐĂNG KÝ',

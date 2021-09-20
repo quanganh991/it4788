@@ -116,9 +116,8 @@ class PostFromOnePersonContainerState extends State<PostFromOnePersonContainer> 
                     ),
                   ],
                 );
-                //chèn StreamBuiler vào đây
               }
-              return CircularProgressIndicator();
+              return Container();
             }),
       ),
     );
@@ -251,7 +250,8 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
   final combine_posts_users_models each_post;
   final users_models currentUser;
   Future<IconData> icon;
-  int likeqty = 0;
+  int result = 0;
+  int likeqty = 0, cmtqty = 0;
   bool isLoading;
 
   _PostFromOnePersonStatsState({
@@ -265,6 +265,7 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
     super.initState();
     icon = LikeController.CheckHasBeenLikedPostEvent(each_post.id_posts.toString(), currentUser.id_users.toString());
     likeqty = int.parse(each_post.likes_post.toString());
+
     isLoading = false;
   }
 
@@ -279,7 +280,7 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
             Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
               context, //điều hướng từ
               MaterialPageRoute(
-                  builder: (context) => ListLike(each_post: each_post)
+                  builder: (context) => ListLike(each_post: each_post, currentUser: currentUser,)
               ),
             )
           },
@@ -314,15 +315,34 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
                   ),
                 ),
               ),
-              Text(
-                //số lượng comment
 
-                each_post.comment_post.toString() + " Comments",
 
-                style: TextStyle(
-                  color: Colors.grey[600],
-                ),
+              StreamBuilder(
+                stream: post_from_friend_controller.GetPostDetailFromIdRealtime(each_post.id_posts.toString()),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    cmtqty = snapshot.data.comment_post >= cmtqty ? snapshot.data.comment_post : cmtqty;
+                    return
+                      Text(
+                        //số lượng comment
+                        cmtqty.toString() + " Comments",
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                        ),
+                      );
+                  }
+                  return Text(
+                    //số lượng comment
+                    "0 Comments",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                    ),
+                  );
+                },
               ),
+
+
+
               const SizedBox(width: 8.0),
               //khoảng cách giữa số comment và số lượt share
               Text(
@@ -346,8 +366,6 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
               future: icon, //NẾU ĐÃ LIKE HAY CHƯA LIKE
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  print("--------------icon là = " + snapshot.data.toString());
-
                   return
                     _PostButton(
                         icon: Icon(
@@ -383,7 +401,7 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
                           }),
                         });
                 } else {
-                  return CircularProgressIndicator();
+                  return Container();
                 }
               },
             ),
@@ -394,15 +412,19 @@ class _PostFromOnePersonStatsState extends State<_PostFromOnePersonStats> {
                 size: 20.0,
               ),
               label: 'Comment',
-              onTap: () => {
+              onTap:  () async =>  {
                 //Xử lý sự kiện Comments: Hiển thị danh sách comment
-                Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
+                result = await Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
                   context,  //điều hướng từ
                   MaterialPageRoute(
                       builder: (context) => ListComment(posts: each_post, currentUser: currentUser)
                   ),
-
                 ),
+
+                setState(() {
+                  cmtqty = result != null ? result : 0;
+                })
+
                 //Xử lý sự kiện Comments
               },
             ),

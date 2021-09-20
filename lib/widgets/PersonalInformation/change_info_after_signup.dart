@@ -1,46 +1,58 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fakebook_homepage/controllers/login/login_controller.dart';
-import 'package:fakebook_homepage/controllers/login/signup_controller.dart';
+import 'package:fakebook_homepage/controllers/Personal/change_personal_information.dart';
 
 import 'package:fakebook_homepage/models/models.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fakebook_homepage/widgets/login/utilities/constants.dart';
-import 'package:fakebook_homepage/screens/nav_screen.dart';
-import 'package:fakebook_homepage/screens/screens.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ChangeInformation extends StatefulWidget {
+class ChangeInfoScreen extends StatefulWidget {
+
+  final users_models currentUser;
+
+  const ChangeInfoScreen({Key key, this.currentUser}) : super(key: key);
+
+
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _ChangeInfoScreenState createState() => _ChangeInfoScreenState(currentUser: currentUser);
 }
 
-class _SignUpScreenState extends State<ChangeInformation> {
+class _ChangeInfoScreenState extends State<ChangeInfoScreen> {
+
+  final users_models currentUser;
+
+
+  _ChangeInfoScreenState({Key key, this.currentUser}) : super();
+
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController name = TextEditingController();
-
-
   TextEditingController country = TextEditingController();
   TextEditingController city = TextEditingController();
   TextEditingController company = TextEditingController();
-
-  Future<users_models> currentUserHere;
-
-
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  SharedPreferences prefs;
-
-  bool isLoggedIn = false;
-  User currentUser;
+  TextEditingController avatar = TextEditingController();
+  TextEditingController cover_picture = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    username.text = currentUser.username.toString();
+    password.text = currentUser.password.toString();
+    name.text = currentUser.name.toString();
+    country.text = currentUser.country.toString();
+    city.text = currentUser.city.toString();
+    company.text = currentUser.company.toString();
+    avatar.text = currentUser.avatar.toString();
+    cover_picture.text = currentUser.cover_picture.toString();
+  }
+
+  getImage() async {
+    const url = 'https://vi.imgbb.com/';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -61,10 +73,10 @@ class _SignUpScreenState extends State<ChangeInformation> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(0xFF65E6FF),
-                      Color(0xFF00B4FF),
-                      Color(0xFF0084FF),
-                      Color(0xFF0D26EA),
+                      Color(0xFFFFFFFF),
+                      Color(0xFFF1F8FA),
+                      Color(0xFFDDE9EB),
+                      Color(0xFFCCDADD),
                     ],
                     stops: [0.1, 0.4, 0.7, 0.9],
                   ),
@@ -85,9 +97,9 @@ class _SignUpScreenState extends State<ChangeInformation> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'ĐĂNG KÝ',
+                        'CHANGE PERSONAL INFO',
                         style: TextStyle(
-                          color: Colors.deepOrangeAccent,
+                          color: Colors.blue,
                           fontFamily: 'OpenSans',
                           fontSize: 30.0,
                           fontWeight: FontWeight.bold,
@@ -117,7 +129,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                               controller: username,
                               keyboardType: TextInputType.emailAddress, //Yêu cầu người dùng phải nhập email trong khung
                               style: TextStyle(
-                                color: Colors.white, //màu chữ khi người dùng nhập vào thanh email
+                                color: Colors.black, //màu chữ khi người dùng nhập vào thanh email
                                 fontFamily: 'OpenSans',
                               ),
                               decoration: InputDecoration(
@@ -161,7 +173,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                             child: TextField(
                               controller: password,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'OpenSans',
                               ),
                               decoration: InputDecoration(
@@ -202,7 +214,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                             child: TextField(
                               controller: name,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'OpenSans',
                               ),
                               decoration: InputDecoration(
@@ -243,7 +255,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                             child: TextField(
                               controller: country,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'OpenSans',
                               ),
                               decoration: InputDecoration(
@@ -284,7 +296,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                             child: TextField(
                               controller: city,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'OpenSans',
                               ),
                               decoration: InputDecoration(
@@ -325,7 +337,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                             child: TextField(
                               controller: company,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'OpenSans',
                               ),
                               decoration: InputDecoration(
@@ -346,6 +358,108 @@ class _SignUpScreenState extends State<ChangeInformation> {
                         ],
                       ),
 
+                      SizedBox(
+                        //khoảng cách từ khung nhập email đến khung nhập password là 30
+                        height: 30.0,
+                      ),
+                      // _buildPasswordTF(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Avatar',
+                            style: kLabelStyle,
+                          ),
+                          SizedBox(height: 10.0),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            decoration: kBoxDecorationStyle,
+                            height: 60.0,
+                            child: TextField(
+                              controller: avatar,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontFamily: 'OpenSans',
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.only(top: 14.0),
+                                prefixIcon: Icon(
+                                  Icons.people,
+                                  color: Colors.greenAccent,
+                                ),
+                                hintText: 'Avatar',
+                                hintStyle: kHintTextStyle,
+                              ),
+                              onChanged: (text) {//khi nội dung trong ô "mật khẩu" thay đổi
+                                //password = text;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(
+                        //khoảng cách từ khung nhập email đến khung nhập password là 30
+                        height: 30.0,
+                      ),
+                      // _buildPasswordTF(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Cover Picture',
+                            style: kLabelStyle,
+                          ),
+                          SizedBox(height: 10.0),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            decoration: kBoxDecorationStyle,
+                            height: 60.0,
+                            child: TextField(
+                              controller: cover_picture,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontFamily: 'OpenSans',
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.only(top: 14.0),
+                                prefixIcon: Icon(
+                                  Icons.picture_in_picture_sharp,
+                                  color: Colors.greenAccent,
+                                ),
+                                hintText: 'Cover Picture',
+                                hintStyle: kHintTextStyle,
+                              ),
+                              onChanged: (text) {//khi nội dung trong ô "mật khẩu" thay đổi
+                                //password = text;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(
+                        //khoảng cách từ khung nhập email đến khung nhập password là 30
+                        height: 30.0,
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.image, color: Colors.green,),
+                              title: Text('Upload Image', style: TextStyle(fontWeight: FontWeight.w600),),
+                              onTap: (){
+                                getImage();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 25.0),
                         //khoảng cách giữa nút ĐĂNG NHẬP và các thành phần trên, dưới với nó
@@ -354,11 +468,10 @@ class _SignUpScreenState extends State<ChangeInformation> {
                         child: RaisedButton(
                           elevation: 5.0,
                           onPressed: () => {
-                            print('SignUp Button Pressed'),
                             //gửi dữ liệu lên server
                             setState(() { //thay đổi trạng thái hiện tại của intent
-                              currentUserHere = signup_controller.HandleSignUp(
-                                  username.text, password.text, name.text, country.text, city.text, company.text); //gọi hàm xử lý đăng nhập
+                              // currentUserHere = signup_controller.HandleSignUp(
+                              //     username.text, password.text, name.text, country.text, city.text, company.text); //gọi hàm xử lý đăng nhập
                             }),
                           },
 
@@ -367,12 +480,29 @@ class _SignUpScreenState extends State<ChangeInformation> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           ),
-                          color: Colors.white,
-                          child: currentUserHere == null ?
-                          Text(
-                            'ĐĂNG KÝ',
+                          color: Colors.lightBlue,
+                          child:
+                          FlatButton(
+
+                              onPressed: () {
+                                change_personal_information.ChangePersonalInformation(
+                                    currentUser.id_users.toString(),
+                                    username.text,
+                                    password.text,
+                                    name.text,
+                                    currentUser.create_at.toString(),
+                                    currentUser.push_token.toString(),
+                                    country.text,
+                                    city.text,
+                                    company.text,
+                                    avatar.text,
+                                  cover_picture.text
+                                );
+                              },
+                              child: Text(
+                            'Change Info',
                             style: TextStyle(
-                              color: Color(0xFF527DAA),
+                              color: Color(0xFFFFFFFF),
                               letterSpacing: 1.5,
                               //Khoảng cách giữa cách chữ Đ, Ă, N, G, N, H, Ậ, P
                               fontSize: 18.0,
@@ -380,73 +510,7 @@ class _SignUpScreenState extends State<ChangeInformation> {
                               fontFamily: 'OpenSans',
                             ),
                           )
-                              :
-                          Column(
-                              children: <Widget>[
-                                FutureBuilder<users_models>(
-                                  future: currentUserHere, //chờ khi nào giá trị này khác null thì đoạn này mới đc thực hiện //Album _futureAlbum = new Album();
-                                  builder: (context, snapshot) {  //snapshot = _futureAlbum
-                                    if (snapshot.hasData && snapshot.data.id_users != null) {
-                                      WidgetsBinding.instance.addPostFrameCallback((_){
-                                        Navigator.push( //điều hướng sang màn hình mới (Màn hình HomeScreen)
-                                          context,  //điều hướng từ
-                                          MaterialPageRoute(  //điều hướng sang
-                                            //bên dưới cũng có hàm route sang NavScreen, nhưng route ở đây là route khi kiểm tra ngay từ đầu, nếu đã đăng nhập lần trước rồi thì route ngay
-                                              builder: (context) => NavScreen(currentUser: snapshot.data) //chuyển sang home page chứa 6 cái màn hình
-                                          ),
-                                        );
-                                      });
-                                      currentUserHere = null;
-                                      Fluttertoast.showToast(
-                                          msg: "Đăng ký thành công, đang đăng nhập",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.CENTER,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.red,
-                                          textColor: Colors.white,
-                                          fontSize: 16.0
-                                      );
-                                      return Text(
-                                        'ĐĂNG KÝ',
-                                        style: TextStyle(
-                                          color: Color(0xFF527DAA),
-                                          letterSpacing: 1.5,
-                                          //Khoảng cách giữa cách chữ Đ, Ă, N, G, N, H, Ậ, P
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'OpenSans',
-                                        ),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      currentUserHere = null;
-                                      return Text("${snapshot.error}");
-                                    } else {
-                                      Fluttertoast.showToast(
-                                          msg: "Tài khoản đã tồn tại hoặc không hợp lệ",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.CENTER,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.red,
-                                          textColor: Colors.white,
-                                          fontSize: 16.0
-                                      );
-                                      currentUserHere = null;
-                                      return Text(
-                                        'ĐĂNG KÝ',
-                                        style: TextStyle(
-                                          color: Color(0xFF527DAA),
-                                          letterSpacing: 1.5,
-                                          //Khoảng cách giữa cách chữ Đ, Ă, N, G, N, H, Ậ, P
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'OpenSans',
-                                        ),
-                                      ); //xoay vòng xoay vòng
-                                    }
-                                  },
-                                ),
-                              ]
-                          ),
+                          )
                         ),
                       ),
                     ],
